@@ -1,28 +1,34 @@
+# JEST & TypeScript: in breve
+
 Tra gli sviluppatori l'argomento testing è ancora molto controverso, con questo articolo ci piacerebbe aiutare chi vorrebbe fare i primi passi nel mondo del **testing**.
 
 All'inizio può risultare frustrante e non si sa mai da dove cominciare... ma grazie a questa breve guida faremo un piccolo passo avanti: vedremo come mettere in piedi da zero un progetto configurato per eseguire degli Unit Test con Jest e TypeScript.
 
 ### Table of Contents
 
-- [Inizializzazione del Progetto](#inizializzazione-del-progetto)
-- [Installazione e Configurazione di JEST con TypeScript](#installazione-e-configurazione-di-jest-con-typescript)
-  - [Configurare TypeScript](#configurare-typescript)
-  - [Configurare JEST](#configurare-jest)
-- [Test d'esempio](#test-desempio)
-- [A che serve Husky e come si usa?](#a-che-serve-husky-e-come-si-usa)
+- [JEST & TypeScript: in breve](#jest--typescript-in-breve)
+  - [Table of Contents](#table-of-contents)
+  - [Prerequisiti](#prerequisiti)
+  - [Steps](#steps)
+  - [Cos'è JEST?](#cosè-jest)
+  - [Inizializzazione del Progetto](#inizializzazione-del-progetto)
+  - [Installazione e Configurazione di JEST con TypeScript](#installazione-e-configurazione-di-jest-con-typescript)
+    - [Configurare TypeScript](#configurare-typescript)
+    - [Configurare JEST](#configurare-jest)
+  - [Test d'esempio](#test-desempio)
+  - [A che serve Husky e come si usa?](#a-che-serve-husky-e-come-si-usa)
     - [Formattazione](#formattazione)
     - [Testing](#testing)
-  
 
 ### Prerequisiti
 
-* Aver installato Git
-* Account GitLab/Github
-* Code Editor (VSCode)
-* Conoscenza base di [TypeScript](https://www.TypeScriptlang.org/docs/)
-* Documentazione di [Jest](https://jestjs.io/docs/getting-started) a portata di mano!
+- Aver installato Git
+- Account GitLab/Github
+- Code Editor (VSCode)
+- Conoscenza base di [TypeScript](https://www.TypeScriptlang.org/docs/)
+- Documentazione di [Jest](https://jestjs.io/docs/getting-started) a portata di mano!
 
-*i primi due punti sono opzionali se si vuole mantenere il codice in locale*
+_i primi due punti sono opzionali se si vuole mantenere il codice in locale_
 
 ### Steps
 
@@ -50,14 +56,15 @@ Jest è un framework per la creazione di Test in Javascript può essere utilizza
 ## Installazione e Configurazione di JEST con TypeScript
 
 ```sh
-> npm i jest @types/jest ts-jest TypeScript -D
+> npm i jest @types/jest ts-jest ts-node typescript -D
 ```
 
-* Installare il framework jest
-* Installare i tipi per jest (@types/jest)
-* Installare ts-jest che ci consente di testare con Jest i progetti scritti in TypeScript
-* Installare TypeScript prerequisito per 'ts-jest'.
-* Con il -D specifichiamo che le dipendenze devono essere salvate come dev dependencies nel package.json
+- Installare il framework jest
+- Installare i tipi per jest (@types/jest)
+- Installare ts-jest che ci consente di testare con Jest i progetti scritti in TypeScript
+- Installare TypeScript prerequisito per 'ts-jest'.
+- Installare ts-node necessario se usiamo i file di configurazione jest in TypeScript
+- Con il -D specifichiamo che le dipendenze devono essere salvate come dev dependencies nel package.json
 
 ### Configurare TypeScript
 
@@ -67,7 +74,7 @@ Jest è un framework per la creazione di Test in Javascript può essere utilizza
 
 Lanciando questo comando verrà creato un file tsconfig.json nel quale definiamo le configurazioni iniziali del nostro progetto TypeScript.
 
-Aggiungiamo il campo *include* nel file `tsconfig.json` in modo da definire i file o i patterns da includere nel progetto, solo i file che si trovano sotto una specifica cartella ad esempio: `/src` saranno inclusi nella compilazione.
+Aggiungiamo il campo _include_ nel file `tsconfig.json` in modo da definire i file o i patterns da includere nel progetto, solo i file che si trovano sotto una specifica cartella ad esempio: `/src` saranno inclusi nella compilazione.
 
 ```JSON
   "include": ["src/**/*"],
@@ -87,7 +94,9 @@ Per prima cosa generiamo il file jest.config utilizzando il comando:
 
 Seguiamo le istruzioni e quando ci verrà chiesto se vogliamo utilizzare TypeScript digitiamo "y". Una volta aver risposto a tutte le domande verrà creato un file jest.config.ts
 
-Alla configurazione aggiungiamo il campo trasform dove definiamo che compileremo i file di test .ts utilizzando ts-jest
+![jest-init](/assets/images/jest-init.png)
+
+Alla configurazione scommentiamo e aggiorniamo il campo trasform dove definiamo che compileremo i file di test .ts utilizzando ts-jest
 
 ```TypeScript
   transform: {
@@ -95,7 +104,7 @@ Alla configurazione aggiungiamo il campo trasform dove definiamo che compileremo
   },
 ```
 
-e definiamo anche i pattern dove si trovano i test che dovranno essere ignorati:
+e allo stesso modo definiamo anche i pattern dove si trovano i test che dovranno essere ignorati:
 
 ```TypeScript
  testPathIgnorePatterns: ["/node_modules/", "/dist"],
@@ -114,15 +123,62 @@ Ora non ci resta che scrivere i test e il codice da testare.
 
 ## Test d'esempio
 
+Una volta confiugrato l'ambiente vedremo come creare un primo test. Come test d'esempio vorremmo testare il comportamento di una funzione che tenga in memoria un dato numero x a cui poi verrà aggiunto un altro numero y.
+
+- Creiamo una cartella `src` dove risiederà il nostro codice.
+- Sotto `src` creiamo poi una cartella che per convenzione chiameremo `__test__` dove andremo ad aggiungere i file `example.test.ts`.
+- Aggiungiamo poi la funzionalità che vogliamo testare sotto `src` nel file `example.ts`
+- Lanciamo i test con `npm run test`
+
+usiamo `describe` per creare una suite di test e quindi per raggruppare più test correlati tra loro, nel nostro caso riguardanti la funzionalià Adder. Mentre `it` è un alias di `test` ed è usato per singole istanze. Il test controllerà che le nostre asserzioni siano vere altrimenti fallirà.
+
+```typescript
+describe("Adder", () => {
+  it("check if add is a function", () => {
+    const add = adder();
+    expect(typeof add).toBe("function");
+  });
+  it("check add parameters", () => {
+    const addTen = adder(10);
+    expect(addTen).toHaveLength(1);
+  });
+  it("add 5", () => {
+    const addFive = adder(5);
+    expect(addFive(5)).toBe(10);
+    expect(addFive(7)).toBe(12);
+  });
+  it("add 12", () => {
+    const addTwelve = adder(12);
+    expect(addTwelve(5)).toBe(17);
+    expect(addTwelve(2)).toBe(14);
+  });
+  it("add without init number", () => {
+    const addNeutral = adder();
+    expect(addNeutral(5)).toBe(5);
+    expect(addNeutral(2)).toBe(2);
+  });
+});
+```
+
+Funzione testata:
+
+```typescript
+export function adder(initNum: number = 0) {
+  return function (numToAdd: number) {
+    return initNum + numToAdd;
+  };
+}
+```
+
 ## A che serve Husky e come si usa?
 
 Husky serve a configurare Git hooks personalizzati usando Javascript. Viene utilizzato nel caso volessi eseguire del codice Javascript/TypeScript prima che la commit sia eseguita.
 Utilizzo di Husky in questo progetto:
 
-* formattazione
-* testing
+- formattazione
+- testing
 
-Abbiamo utilizzato Husky per eseguire prima della commit la formattazione dei file con *Prettier*. Abbiamo poi aggiunto la condizione che per committare devono andare a buon fine i test.
+Abbiamo utilizzato Husky per eseguire prima della commit la formattazione dei file con _Prettier_. Abbiamo poi aggiunto la condizione che per committare devono andare a buon fine i test.
 
 #### Formattazione
 
@@ -156,7 +212,7 @@ quindi prima di fare la commit verrà eseguito il comando `npm run test-precommi
 "scripts": {
 
     "test": "jest --watchAll --verbose",
-    "test-precommit": "jest --ci", 
+    "test-precommit": "jest --ci",
 
   }
 ```
